@@ -1,0 +1,5 @@
+#define kCommitHash 0x3c4a
+#define kMajor      1
+#define kMinor      0
+#define kBuild      0
+#define kCommitTimestamp "2022-01-26 12:42:44"
