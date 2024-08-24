@@ -50,7 +50,7 @@
 /* 计算APP区每页/扇区的大小 */
 #define APP_FLASH_STEP          (ADDR_FLASH_PAGE_12 - ADDR_FLASH_PAGE_11)				/* Size of page : 1 Kbytes */
 /* End of the Flash address */
-#define USER_FLASH_END_ADDRESS     (ADDR_FLASH_PAGE_63 + APP_FLASH_STEP - 1)
+#define USER_FLASH_END_ADDRESS     (ADDR_FLASH_PAGE_59 + APP_FLASH_STEP - 1)            /* Page 60~64 for database */
 
 
 #elif FLASH_IS_1024K
