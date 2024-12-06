@@ -520,64 +520,71 @@ static COM_StatusTypeDef DealYmodem1stPacket(uint32_t dataLen, uint32_t srcAddr)
   */
 void SerialDownload(void)
 {
-  uint32_t size = 0;
-//  COM_StatusTypeDef result;
-	CRC16_Init(&ctx);
+	
+  uint32_t size = 0; // 用于存储接收的应用程序的大小
+	uint8_t time = 100;
+  CRC16_Init(&ctx);  // 初始化 CRC16 校验
 
-	do {
-		result = Ymodem_Receive( &size );//进入ymodem传输模式
-	} while(result == COM_UPERR);
+  // 使用 Ymodem 协议接收数据，直到接收到有效数据或者升级失败
+  do {
+    result = Ymodem_Receive(&size); // 进入 Ymodem 传输模式，接收数据
+  } while (result == COM_UPERR);    // 如果是传输错误，则继续重试
 
-	if (result == COM_OK) {	
-		  AppHeader.dataCRC = appDataCrc.binCrc;//
-		  uint16_t calcCRC = CRC16_CCITT((uint8_t *)AppHeader.entryPointAddr, size, 0);
-			#if DEBUG_PRINT
-		  printf("binCrc:%04x,calcCRC:%04x,size:%d\r\n",AppHeader.dataCRC,calcCRC,size);
-			#endif
-			/* 对整个APPLICATION文件的有效性进行判断，包括：
-			 * 1、文件长度；2、CCITT CRC16 的校验
-			 */
-			if ((AppHeader.dataLen == size) && (AppHeader.dataCRC == calcCRC)) {
-				/* 擦除扇区：APP Header */
-				#if DEBUG_PRINT
-				printf("Waiting for APP Header Erase ...\n\r");
-				HAL_Delay(100);
-				#endif
-				HAL_FLASH_Unlock();
-				FLASH_If_Erase(APPHEADER_ADDRESS, APPHEADER_ADDRESS + APP_FLASH_STEP); // 清除flash
-				HAL_FLASH_Lock();
-//				for (uint16_t i = 0; i < CFG_SIZE; i++) {
-//					FLASH_If_Write(APPHEADER_ADDRESS + i*4,&cfg[i],1);
-//				}
-				FLASH_If_Erase(APP_UPGRADE_ADDRESS, APP_UPGRADE_ADDRESS + APP_FLASH_STEP);// 清除升级标志
-				HAL_NVIC_SystemReset();
-			} else {
-				/* Initiates a system reset request to reset the MCU */
-				#if DEBUG_PRINT
-				printf("size err or crc err!\n\r");
-				#endif
-				HAL_NVIC_SystemReset();
-			}
+  if (result == COM_OK) {
+    // 接收成功，进行数据校验
+    AppHeader.dataCRC = appDataCrc.binCrc; // 获取接收数据的 CRC
+    uint16_t calcCRC = CRC16_CCITT((uint8_t *)AppHeader.entryPointAddr, size, 0); // 计算数据的 CRC
+
+    #if DEBUG_PRINT
+      // 输出接收数据的大小和 CRC 校验信息
+      printf("binCrc:%04x, calcCRC:%04x, size:%d\r\n", AppHeader.dataCRC, calcCRC, size);
+    #endif
+
+    // 检查数据长度和 CRC 是否匹配，判断接收的应用程序是否有效
+    if ((AppHeader.dataLen == size) && (AppHeader.dataCRC == calcCRC)) {
+      #if DEBUG_PRINT
+       printf("Waiting for APP Header Erase ...\n\r");
+      #endif
+      HAL_FLASH_Unlock(); // 解锁 Flash 操作
+      FLASH_If_Erase(APPHEADER_ADDRESS, APPHEADER_ADDRESS + APP_FLASH_STEP); // 擦除 APP Header 区域
+      FLASH_If_Erase(APP_UPGRADE_ADDRESS, APP_UPGRADE_ADDRESS + APP_FLASH_STEP); // 清除升级标志，准备写入新应用程序
+      HAL_FLASH_Lock();   // 重新锁定 Flash
+			while(time--){}
+			printf("erase and reset.\n\r");
+      HAL_NVIC_SystemReset(); // 系统重启，加载新应用程序
+    } else {
+      // 如果数据长度或 CRC 校验失败
+      #if DEBUG_PRINT
+        printf("size err or crc err!\n\r");
+      #endif
+      HAL_NVIC_SystemReset(); // 系统重启
+    }
   } else if (result == COM_LIMIT) {
-		#if DEBUG_PRINT
-    printf("\n\n\rThe image size is higher than the allowed space memory!\n\r");
-		#endif
-		HAL_NVIC_SystemReset();
+    // 如果接收的文件大小超出允许的范围
+    #if DEBUG_PRINT
+      printf("\n\n\rThe image size is higher than the allowed space memory!\n\r");
+    #endif
+
+    HAL_NVIC_SystemReset(); // 系统重启
   } else if (result == COM_DATA) {
-		#if DEBUG_PRINT
-    printf("\n\n\rVerification failed!\n\r");
-		#endif
-		HAL_NVIC_SystemReset();
+    // 如果数据验证失败
+    #if DEBUG_PRINT
+      printf("\n\n\rVerification failed!\n\r");
+    #endif
+    HAL_NVIC_SystemReset(); // 系统重启
   } else if (result == COM_ABORT) {
-		#if DEBUG_PRINT
-    printf("\r\n\nAborted by user.\n\r");
-		#endif
-		HAL_NVIC_SystemReset();
+    // 如果用户中止了传输
+    #if DEBUG_PRINT
+      printf("\r\n\nAborted by user.\n\r");
+    #endif
+    HAL_NVIC_SystemReset(); // 系统重启
   } else {
-		#if DEBUG_PRINT
-    printf("\n\rFailed to receive the file!\n\r");
-		#endif
-		HAL_NVIC_SystemReset();
+    // 如果接收失败，未能识别的错误
+    #if DEBUG_PRINT
+			printf("\n\rFailed to receive the file!\n\r");
+    #endif
+
+    HAL_NVIC_SystemReset(); // 系统重启
   }
 }
 

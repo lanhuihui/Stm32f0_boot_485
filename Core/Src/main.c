@@ -133,14 +133,17 @@ int main(void)
 	HAL_FLASH_Unlock();
 	FLASH_If_Erase(APPLICATION_ADDRESS, USER_FLASH_END_ADDRESS);
 	HAL_FLASH_Lock();
+	//SerialDownload();
 	printf("enter boot!\n");
 	uint8_t param = 0xAA;
-	HAL_UART_Transmit_IT(&DEBUG_COM, &param, 1);
+	HAL_UART_Transmit(&DEBUG_COM, &param, 1,0XFF);
 	/* Download user application in the Flash */
+	
+	
 	
 	SerialDownload();
   /* USER CODE END 2 */
-
+	
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
