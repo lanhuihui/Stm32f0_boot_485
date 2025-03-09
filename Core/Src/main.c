@@ -78,14 +78,12 @@ uint16_t pagesIndex = 0;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  MX_USART2_UART_Init();
 //	__disable_irq();
 	AppHeader.magicName = *(__IO uint32_t*)APP_UPGRADE_ADDRESS;
 	AppHeader.entryPointAddr = APPLICATION_ADDRESS;
 
 	if (AppHeader.magicName == APP_JUMP_TO_APP) {
 		/* Jump to user application */
-    printf("Jump to application\r\n");
 		JumpAddress = *(__IO uint32_t*) (AppHeader.entryPointAddr + 4);
 		JumpToApplication = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
@@ -112,7 +110,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  // MX_USART2_UART_Init();
+  MX_USART2_UART_Init();
   MX_USART1_UART_Init();
 //	__enable_irq();
   /* USER CODE BEGIN 2 */
