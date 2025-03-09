@@ -82,12 +82,12 @@
         <Book>
           <Number>0</Number>
           <Title>Data Brief (STM32F051-Discovery)</Title>
-          <Path>d:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\1.4.0\Boards\ST\STM32F051-Discovery\Documents\DM00050631.pdf</Path>
+          <Path>D:\Program Files (x86)\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.0.0\MDK/Boards/ST/STM32F051-Discovery/Documents/DM00050631.pdf</Path>
         </Book>
         <Book>
           <Number>1</Number>
           <Title>Schematics (STM32F051-Discovery)</Title>
-          <Path>d:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\1.4.0\Boards\ST\STM32F051-Discovery\Documents\MB1034.pdf</Path>
+          <Path>D:\Program Files (x86)\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\2.0.0\MDK/Boards/ST/STM32F051-Discovery/Documents/MB1034.pdf</Path>
         </Book>
         <Book>
           <Number>2</Number>
@@ -117,7 +117,7 @@
         <tRSysVw>1</tRSysVw>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
-        <nTsel>5</nTsel>
+        <nTsel>11</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -169,7 +169,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>ST-LINKIII-KEIL_SWO</Key>
-          <Name>-U066AFF565151727187171018 -O2254 -S1 -C0 -A0 -N00("ARM CoreSight SW-DP") -D00(0BB11477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8004 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO31 -FD20000000 -FC2000 -FN1 -FF0STM32F0xx_64.FLM -FS08000000 -FL010000 -FP0($$Device:STM32F051C8$Flash\STM32F0xx_64.FLM)</Name>
+          <Name>-U0672FF495352845187123645 -I0 -O2254 -S1 -C0 -A0 -N00("ARM CoreSight SW-DP") -D00(0BB11477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8004 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO31 -FD20000000 -FC2000 -FN0</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint>
@@ -290,7 +290,6 @@
       </DebugFlag>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
-      <bLintAuto>0</bLintAuto>
       <DebugDescription>
         <Enable>1</Enable>
         <EnableLog>0</EnableLog>
@@ -396,7 +395,7 @@
 
   <Group>
     <GroupName>Drivers/STM32F0xx_HAL_Driver</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

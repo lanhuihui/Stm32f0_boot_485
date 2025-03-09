@@ -520,8 +520,7 @@ static COM_StatusTypeDef DealYmodem1stPacket(uint32_t dataLen, uint32_t srcAddr)
   */
 void SerialDownload(void)
 {
-  uint32_t size = 0;
-//  COM_StatusTypeDef result;
+	uint32_t size = 0;
 	CRC16_Init(&ctx);
 
 	do {
@@ -529,56 +528,43 @@ void SerialDownload(void)
 	} while(result == COM_UPERR);
 
 	if (result == COM_OK) {	
-		  AppHeader.dataCRC = appDataCrc.binCrc;//
-		  uint16_t calcCRC = CRC16_CCITT((uint8_t *)AppHeader.entryPointAddr, size, 0);
-			#if DEBUG_PRINT
-		  printf("binCrc:%04x,calcCRC:%04x,size:%d\r\n",AppHeader.dataCRC,calcCRC,size);
-			#endif
-			/* 对整个APPLICATION文件的有效性进行判断，包括：
-			 * 1、文件长度；2、CCITT CRC16 的校验
-			 */
-			if ((AppHeader.dataLen == size) && (AppHeader.dataCRC == calcCRC)) {
-				/* 擦除扇区：APP Header */
-				#if DEBUG_PRINT
-				printf("Waiting for APP Header Erase ...\n\r");
-				HAL_Delay(100);
-				#endif
-				HAL_FLASH_Unlock();
-				FLASH_If_Erase(APPHEADER_ADDRESS, APPHEADER_ADDRESS + APP_FLASH_STEP); // 清除flash
-				HAL_FLASH_Lock();
-//				for (uint16_t i = 0; i < CFG_SIZE; i++) {
-//					FLASH_If_Write(APPHEADER_ADDRESS + i*4,&cfg[i],1);
-//				}
-				FLASH_If_Erase(APP_UPGRADE_ADDRESS, APP_UPGRADE_ADDRESS + APP_FLASH_STEP);// 清除升级标志
-				HAL_NVIC_SystemReset();
-			} else {
-				/* Initiates a system reset request to reset the MCU */
-				#if DEBUG_PRINT
-				printf("size err or crc err!\n\r");
-				#endif
-				HAL_NVIC_SystemReset();
-			}
-  } else if (result == COM_LIMIT) {
-		#if DEBUG_PRINT
-    printf("\n\n\rThe image size is higher than the allowed space memory!\n\r");
-		#endif
+		AppHeader.dataCRC = appDataCrc.binCrc;//
+		uint16_t calcCRC = CRC16_CCITT((uint8_t *)AppHeader.entryPointAddr, size, 0);
+		printf("binCrc:%04x,calcCRC:%04x,size:%d\r\n",AppHeader.dataCRC,calcCRC,size);
+		/* 对整个APPLICATION文件的有效性进行判断，包括：
+		* 1、文件长度；2、CCITT CRC16 的校验
+		*/
+		if ((AppHeader.dataLen == size) && (AppHeader.dataCRC == calcCRC)) {
+			/* 擦除扇区：APP Header */
+			printf("Waiting for APP Header Erase ...\n\r");
+			HAL_FLASH_Unlock();
+			FLASH_If_Erase(APPHEADER_ADDRESS, APPHEADER_ADDRESS + APP_FLASH_STEP); // 清除flash
+			HAL_FLASH_Lock();
+			/* 写入跳转APP标志 */
+			uint32_t writeRequestUpdateFlag = APP_JUMP_TO_APP;
+			HAL_FLASH_Unlock();
+			FLASH_If_Erase(APP_UPGRADE_ADDRESS, APP_UPGRADE_ADDRESS+APP_FLASH_STEP);
+			FLASH_If_Write(APP_UPGRADE_ADDRESS, &writeRequestUpdateFlag, sizeof(writeRequestUpdateFlag));
+			HAL_FLASH_Lock();
+			HAL_NVIC_SystemReset();
+		} else {
+			/* Initiates a system reset request to reset the MCU */
+			printf("size err or crc err!\n\r");
+			HAL_NVIC_SystemReset();
+		}
+	} else if (result == COM_LIMIT) {
+		printf("\n\n\rThe image size is higher than the allowed space memory!\n\r");
 		HAL_NVIC_SystemReset();
-  } else if (result == COM_DATA) {
-		#if DEBUG_PRINT
-    printf("\n\n\rVerification failed!\n\r");
-		#endif
+	} else if (result == COM_DATA) {
+		printf("\n\n\rVerification failed!\n\r");
 		HAL_NVIC_SystemReset();
-  } else if (result == COM_ABORT) {
-		#if DEBUG_PRINT
-    printf("\r\n\nAborted by user.\n\r");
-		#endif
+	} else if (result == COM_ABORT) {
+		printf("\r\n\nAborted by user.\n\r");
 		HAL_NVIC_SystemReset();
-  } else {
-		#if DEBUG_PRINT
-    printf("\n\rFailed to receive the file!\n\r");
-		#endif
+	} else {
+		printf("\n\rFailed to receive the file!\n\r");
 		HAL_NVIC_SystemReset();
-  }
+	}
 }
 
 /**

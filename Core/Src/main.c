@@ -78,24 +78,14 @@ uint16_t pagesIndex = 0;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+  MX_USART2_UART_Init();
 //	__disable_irq();
 	AppHeader.magicName = *(__IO uint32_t*)APP_UPGRADE_ADDRESS;
 	AppHeader.entryPointAddr = APPLICATION_ADDRESS;
-//	for(uint16_t i = 0; i < CFG_SIZE; i++) {
-//		cfg[i] = *(__IO uint32_t*)(APPHEADER_ADDRESS + i*4);
-//	}
-//	if(0xffffffff == cfg[BOOT_INDEX]) {
-//		HAL_FLASH_Unlock();
-//		FLASH_If_Erase(APPHEADER_ADDRESS, APPHEADER_ADDRESS + APP_FLASH_STEP);
-//		cfg[BOOT_INDEX] &= 0xffffff00;
-//		cfg[BOOT_INDEX] |= BOOT_VER;
-//		for(uint16_t i = 0; i < CFG_SIZE; i++) {
-//			FLASH_If_Write(APPHEADER_ADDRESS + i*4,&cfg[i],1);
-//		}
-//		HAL_FLASH_Lock();
-//	}
-	if (AppHeader.magicName != APP_UPGREQ_IS_VALID && ((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000) {
+
+	if (AppHeader.magicName == APP_JUMP_TO_APP) {
 		/* Jump to user application */
+    printf("Jump to application\r\n");
 		JumpAddress = *(__IO uint32_t*) (AppHeader.entryPointAddr + 4);
 		JumpToApplication = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
@@ -122,7 +112,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
+  // MX_USART2_UART_Init();
   MX_USART1_UART_Init();
 //	__enable_irq();
   /* USER CODE BEGIN 2 */
@@ -133,9 +123,7 @@ int main(void)
 	HAL_FLASH_Unlock();
 	FLASH_If_Erase(APPLICATION_ADDRESS, USER_FLASH_END_ADDRESS);
 	HAL_FLASH_Lock();
-	printf("enter boot!\n");
-	uint8_t param = 0xAA;
-	HAL_UART_Transmit_IT(&DEBUG_COM, &param, 1);
+	printf("enter boot!\r\n");
 	/* Download user application in the Flash */
 	
 	SerialDownload();

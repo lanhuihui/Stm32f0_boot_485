@@ -24,6 +24,7 @@
 /* Exported defines ----------------------------------------------------------*/
 /* APP 升级请求 */
 #define APP_UPGREQ_IS_VALID			0x214D4478		/* APP升级请求标志：!MDx */
+#define APP_JUMP_TO_APP				0x214A554D		/* 跳转到APP标志：!JUM */
 /* APP起始地址是固定的 */
 #define APPLICATION_ADDRESS_IS_FIXED
 
