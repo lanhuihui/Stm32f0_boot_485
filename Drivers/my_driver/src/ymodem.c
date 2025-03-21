@@ -512,7 +512,14 @@ static COM_StatusTypeDef DealYmodem1stPacket(uint32_t dataLen, uint32_t srcAddr)
 	
 	return ret;
 }
-	
+
+void Write_Flash_APP_UPGREQ_IS_VALID(){
+		uint32_t writeRequestUpdateFlag = APP_UPGREQ_IS_VALID;
+		HAL_FLASH_Unlock();
+		FLASH_If_Erase(APP_UPGRADE_ADDRESS, APP_UPGRADE_ADDRESS+APP_FLASH_STEP);
+		FLASH_If_Write(APP_UPGRADE_ADDRESS, &writeRequestUpdateFlag, sizeof(writeRequestUpdateFlag));
+		HAL_FLASH_Lock();
+}
 /**
   * @brief  Download a file via serial port
   * @param  None
@@ -550,19 +557,24 @@ void SerialDownload(void)
 		} else {
 			/* Initiates a system reset request to reset the MCU */
 			printf("size err or crc err!\n\r");
+			Write_Flash_APP_UPGREQ_IS_VALID();
 			HAL_NVIC_SystemReset();
 		}
 	} else if (result == COM_LIMIT) {
 		printf("\n\n\rThe image size is higher than the allowed space memory!\n\r");
+		Write_Flash_APP_UPGREQ_IS_VALID();
 		HAL_NVIC_SystemReset();
 	} else if (result == COM_DATA) {
 		printf("\n\n\rVerification failed!\n\r");
+		Write_Flash_APP_UPGREQ_IS_VALID();
 		HAL_NVIC_SystemReset();
 	} else if (result == COM_ABORT) {
 		printf("\r\n\nAborted by user.\n\r");
+		Write_Flash_APP_UPGREQ_IS_VALID();
 		HAL_NVIC_SystemReset();
 	} else {
 		printf("\n\rFailed to receive the file!\n\r");
+		Write_Flash_APP_UPGREQ_IS_VALID();
 		HAL_NVIC_SystemReset();
 	}
 }

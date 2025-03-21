@@ -82,7 +82,7 @@ int main(void)
 	AppHeader.magicName = *(__IO uint32_t*)APP_UPGRADE_ADDRESS;
 	AppHeader.entryPointAddr = APPLICATION_ADDRESS;
 
-	if (AppHeader.magicName == APP_JUMP_TO_APP) {
+	if (AppHeader.magicName != APP_UPGREQ_IS_VALID) {
 		/* Jump to user application */
 		JumpAddress = *(__IO uint32_t*) (AppHeader.entryPointAddr + 4);
 		JumpToApplication = (pFunction) JumpAddress;
