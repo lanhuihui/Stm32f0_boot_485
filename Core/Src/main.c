@@ -69,6 +69,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 uint16_t pagesIndex = 0;
 #define RAM_ADDRESS_START 0x20000000
+#define BOOT_VERSION     (0x0300) //boot版本0300，方便判断代码是否版本正确
 /* USER CODE END 0 */
 
 /**
